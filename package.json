@@ -1,5 +1,5 @@
 {
-	"name": "nuxt-app",
+	"name": "simple-card-maker",
 	"private": true,
 	"type": "module",
 	"scripts": {
@@ -11,9 +11,7 @@
 		"tauri": "cd src-tauri && tauri",
 		"tauri:dev": "cd src-tauri && pnpm tauri dev",
 		"tauri:build": "cd src-tauri && pnpm i && pnpm tauri build",
-		"tauri:build:debug": "cd src-tauri && pnpm tauri build --debug",
-		"lint": "eslint .",
-		"lint:fix": "eslint --fix ."
+		"tauri:build:debug": "cd src-tauri && pnpm tauri build --debug"
 	},
 	"dependencies": {
 		"@iconify-json/lucide": "^1.2.39",
@@ -23,14 +21,19 @@
 		"@nuxt/image": "1.10.0",
 		"@nuxt/ui": "3.1.1",
 		"@nuxtjs/i18n": "9.5.4",
+		"@tauri-apps/plugin-dialog": "^2.2.1",
+		"@tauri-apps/plugin-fs": "^2.2.1",
+		"@tauri-apps/plugin-os": "^2.2.1",
 		"@vueuse/nuxt": "13.1.0",
+		"character-card-utils": "^2.0.3",
 		"nuxt": "^3.17.1",
 		"nuxt-auth-utils": "0.5.20",
+		"reka-ui": "^2.2.0",
 		"vue": "^3.5.13"
 	},
 	"devDependencies": {
 		"@tauri-apps/cli": "^2.5.0",
-		"eslint": "^9.26.0",
 		"typescript": "^5.8.3"
-	}
+	},
+	"packageManager": "pnpm@10.10.0"
 }

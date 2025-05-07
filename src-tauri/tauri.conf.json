@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "nuxt-app",
+  "productName": "Simple Card Maker",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "dev.ctrl-neo.simple-card-maker",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:3000",
@@ -12,11 +12,28 @@
   "app": {
     "windows": [
       {
-        "title": "nuxt-app",
-        "width": 800,
-        "height": 600,
+        "title": "Simple Card Maker",
+        "width": 1200,
+        "height": 800,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "backgroundColor": null,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "windowEffects": {
+          "effects": [
+            "blur",
+            "underWindowBackground"
+          ],
+          "radius": 10
+        },
+        "transparent": false,
+        "dragDropEnabled": false,
+        "focus": true,
+        "trafficLightPosition": {
+          "x": 10,
+          "y": 15
+        }
       }
     ],
     "security": {

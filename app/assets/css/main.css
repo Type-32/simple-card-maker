@@ -1,6 +1,15 @@
-@import "tailwindcss" theme(static);
+@import "tailwindcss";
 @import "@nuxt/ui";
 
-@theme {
-  --font-sans: "Public Sans", sans-serif;
+@theme static {
+  --font-sans: "Inter", "Public Sans", "Noto Sans Simplified Chinese", "JetBrains Mono", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+:root {
+  --ui-primary: black;
+}
+
+.dark {
+  --ui-primary: white;
 }

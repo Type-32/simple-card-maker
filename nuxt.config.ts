@@ -1,5 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+    app: {
+        pageTransition: { name: 'page', mode: 'out-in' },
+        layoutTransition: { name: 'layout', mode: 'out-in' }
+    },
+
     devtools: {enabled: true},
 
     modules: ["@nuxt/ui", "nuxt-auth-utils", "@vueuse/nuxt", "@nuxt/image", "@nuxt/icon", "@nuxt/fonts", "@nuxtjs/i18n"],
@@ -11,6 +16,14 @@ export default defineNuxtConfig({
     },
 
     compatibilityDate: "2024-11-27",
+    fonts: {
+        families: [
+            { name: 'Inter' },
+            { name: 'JetBrains Mono' },
+            { name: 'Public Sans' },
+            { name: 'Noto Sans Simplified Chinese' },
+        ],
+    },
 
     // Enable SSG
     ssr: false,

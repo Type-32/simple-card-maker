@@ -6,6 +6,33 @@
     "main"
   ],
   "permissions": [
-    "core:default"
+    "core:default",
+    "fs:read-files",
+    "fs:read-all",
+    "fs:write-files",
+    "fs:allow-app-write-recursive",
+    "fs:allow-app-read-recursive",
+    "fs:write-all",
+    "fs:allow-create",
+    "fs:allow-rename",
+    "fs:create-app-specific-dirs",
+    "fs:allow-copy-file",
+    "fs:allow-fstat",
+    "fs:allow-ftruncate",
+    "fs:allow-lstat",
+    "fs:allow-mkdir",
+    "fs:allow-open",
+    "fs:allow-appconfig-read-recursive",
+    "fs:allow-appconfig-write-recursive",
+    "fs:allow-appdata-write-recursive",
+    "fs:allow-appdata-read-recursive",
+    "fs:default",
+    "dialog:default",
+    "os:default",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    { "identifier": "fs:allow-exists", "allow": [ { "path": "**/**" } ] }
   ]
 }
