@@ -3,6 +3,7 @@ import {useMaker} from "~/composables/maker/useMaker";
 import {useQuickToasts} from "~/composables/utility/useQuickToasts";
 import * as z from 'zod';
 import type { FormSubmitEvent } from '@nuxt/ui'
+import {useWorkspace} from "~/composables/workspace/useWorkspace";
 
 const schema = z.object({
     name: z.string().min(3, 'Must be at least 3 characters')
@@ -13,29 +14,32 @@ const state = reactive<Partial<Schema>>({
 })
 
 const $maker = useMaker()
+const $wk = useWorkspace()
 const $qt = useQuickToasts()
 
 const emit = defineEmits<{ close: [boolean] }>()
 const loading = ref(false)
 
-async function createNewWorkspace(name: string) {
+async function renameWorkspace(name: string) {
     loading.value = true
-    const newId = await $maker.createWorkspaceToBuffer(name)
-    await $maker.openWorkspaceFromBuffer(newId)
+    $wk.writeWorkspace({
+        name: name
+    })
+    await $wk.saveWorkspace()
     loading.value = false
-    $qt.success("Created New Workspace!")
+    $qt.success("Saved Workspace Name.")
     emit('close', true)
 }
 
 async function onSubmit(event: FormSubmitEvent<Schema>) {
-    await createNewWorkspace(event.data.name)
+    await renameWorkspace(event.data.name)
 }
 </script>
 
 <template>
     <UModal
         :close="{ onClick: () => emit('close', false) }"
-        title="Create New Workspace"
+        title="Edit Workspace Name"
         :dismissible="!loading"
     >
         <template #body>

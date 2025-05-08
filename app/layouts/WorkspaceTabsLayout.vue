@@ -19,7 +19,7 @@ const $sidebar = useWorkspaceSidebar()
             <WorkspaceTabsBar/>
             <SplitterGroup
                 auto-save-id="scm.ui.group1.root.autosave"
-                class="h-full pt-6"
+                class="h-full"
                 id="scm.ui.group1.root"
                 direction="horizontal"
             >
@@ -46,18 +46,13 @@ const $sidebar = useWorkspaceSidebar()
                                 <ScrollAreaThumb />
                             </ScrollAreaScrollbar>
                         </ScrollAreaRoot>
-                        <!--                    <div class="w-full flex items-center justify-center p-1 shrink">-->
-                        <!--                        <UDropdownMenu :items="fileOpsDropdown">-->
-                        <!--                            <UButton variant="ghost" class="w-full justify-between" size="sm" trailing-icon="lucide:circle-ellipsis" :label="$scm.getFileName()"/>-->
-                        <!--                        </UDropdownMenu>-->
-                        <!--                    </div>-->
                     </div>
                 </SplitterPanel>
                 <SplitterResizeHandle id="scm.ui.group1.handle.1" class="rounded-lg border-[0.5px] border-default"/>
-                <SplitterPanel id="scm.ui.group1.panel.contentSection" :class="['top-0 bottom-0 relative overflow-visible bg-default']">
-                    <div class="h-full w-full p-2 overflow-visible">
+                <SplitterPanel id="scm.ui.group1.panel.contentSection" class="top-0 bottom-0 relative overflow-visible bg-default">
+                    <div class="h-full w-full overflow-visible">
                         <ScrollAreaRoot class="relative h-full w-full overflow-visible">
-                            <ScrollAreaViewport :class="['w-full h-full rounded-lg bg-default']">
+                            <ScrollAreaViewport class="w-full h-full rounded-lg bg-default overflow-visible">
                                 <slot/>
                             </ScrollAreaViewport>
                             <ScrollAreaScrollbar>

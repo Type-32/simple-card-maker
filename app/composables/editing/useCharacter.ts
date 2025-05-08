@@ -5,7 +5,7 @@ import {useWorkspace} from "~/composables/workspace/useWorkspace";
 
 export function useCharacter() {
     const $qt = useQuickToasts();
-    const { loadedWorkspace, writeWorkspace } = useWorkspace();
+    const { loadedWorkspace, writeWorkspace, saveWorkspace, directToWorkspace } = useWorkspace();
 
     const $currentCharacterId = computed(() => useRoute().params.characterId as string);
     const $currentCharacter = computed({
@@ -58,10 +58,23 @@ export function useCharacter() {
         return wks.cards.find(card => card.id === id);
     }
 
+    function backToWorkspace() {
+        const wks = unref(loadedWorkspace)
+        if (!wks) {
+            $qt.error("Error Returning to Workspace", "Your workspace had managed to somehow... disappear. Please restart the application to make sure that no further changes are lost.")
+            return
+        }
+        saveWorkspace().then(r => {
+            $qt.info("Auto Save", "Saved Workspace Automatically.")
+        })
+        directToWorkspace(wks.id)
+    }
+
     return {
         currentCharacterId: readonly($currentCharacterId),
         currentCharacter: $currentCharacter,
         writeCharacterCard,
-        getCharacterCard
+        getCharacterCard,
+        backToWorkspace
     };
 }

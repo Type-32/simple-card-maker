@@ -4,6 +4,8 @@ import type {PossiblyRef} from "~/types/utility.types";
 import defaultWorkspace from "~/utils/defaults/defaultWorkspace";
 import {useMakerIO} from "~/composables/maker/useMakerIO";
 import {useUUID} from "~/composables/utility/useUUID";
+import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
+import defaultWorkspaceBook from "~/utils/defaults/defaultWorkspaceBook";
 
 export function useWorkspace() {
     const $qt = useQuickToasts()
@@ -68,12 +70,55 @@ export function useWorkspace() {
         }
     }
 
+    async function newCharacter(name: string, redirect: boolean = false) {
+        const temp = defaultWorkspaceCard({
+            card: {
+                // @ts-ignore
+                data: {
+                    name: name
+                }
+            }
+        })
+        $loadedWorkspace.value?.cards.push(temp)
+        await saveWorkspace()
+
+        if (redirect)
+            await directToCharacter(temp.id)
+    }
+
+    async function newLorebook(name: string, redirect: boolean = false) {
+        const temp = defaultWorkspaceBook({
+            //@ts-ignore
+            book: {
+                name: name
+            }
+        })
+        $loadedWorkspace.value?.books.push(temp)
+        await saveWorkspace()
+
+        if (redirect)
+            await directToLorebook(temp.id)
+    }
+
+    function directToCharacter(characterId: string) {
+        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/${characterId}`)
+    }
+
+    function directToLorebook(lorebookId: string) {
+        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/${lorebookId}`)
+    }
+
     return {
         directToWorkspace,
         openWorkspace,
         writeWorkspace,
         saveWorkspace,
         redirectIfExists,
+        newCharacter,
+        newLorebook,
+        directToCharacter,
+        directToLorebook,
         loadedWorkspace: $loadedWorkspace,
+        loadedWorkspaceId: $currentWorkspaceId,
     }
 }

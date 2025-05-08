@@ -1,4 +1,4 @@
-import {type V2, type CharacterBook} from "character-card-utils"
+import type {CharacterBook, TavernCardV2} from "~/types/tavern.types";
 import type {FieldValueType} from "~/types/fields.types";
 
 export type Workspace = {
@@ -11,11 +11,12 @@ export type Workspace = {
 
 export type WorkspaceCard = {
     id: string,
-    card: V2,
+    card: TavernCardV2,
     data: {
         propertiesFormat: boolean, // default should be true.
         descFields: FieldValueType[], // the stored values should not override the TavernCard description field.
-        linkedLorebook: string // The linked lorebook ID.
+        linkedLorebook?: string // The linked lorebook ID.
+        exampleMessages: string[]
     }
 }
 

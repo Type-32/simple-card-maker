@@ -3,7 +3,7 @@ import {useWorkspace} from "~/composables/workspace/useWorkspace";
 import type {WorkspaceBook} from "~/types/maker.types";
 import type {PossiblyRef} from "~/types/utility.types";
 
-export function useBook() {
+export function useLorebook() {
     const $qt = useQuickToasts();
     const { loadedWorkspace, writeWorkspace } = useWorkspace();
 
