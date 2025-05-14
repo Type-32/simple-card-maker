@@ -12,6 +12,7 @@ import type {TavernCardV2} from "~/types/tavern.types";
 import defaultTavernCard from "~/utils/defaults/defaultTavernCard";
 import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
 import {undefined} from "zod";
+import {ScrollAreaRoot, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "reka-ui";
 
 definePageMeta({
     layout: 'workspace-tabs-layout'
@@ -130,6 +131,12 @@ function backToHome() {
                                     <UFormField name="tags" required label="Tags" size="lg">
                                         <UInputMenu multiple create-item :items="state.data.tags" @create="onCreateTag" v-model="state.data.tags" class="w-full"/>
                                     </UFormField>
+                                    <UFormField name="creator" required label="Creator" size="lg">
+                                        <UInput v-model="state.data.creator" class="w-full"/>
+                                    </UFormField>
+                                    <UFormField name="version" required label="Version" size="lg">
+                                        <UInput v-model="state.data.character_version" class="w-full"/>
+                                    </UFormField>
                                 </UForm>
                             </div>
                         </template>
@@ -149,16 +156,43 @@ function backToHome() {
                                             class="w-full"
                                         />
                                     </UFormField>
+                                    <UFormField label="Personality" description="Describe your character's traits, behaviors, and mannerisms.">
+                                        <UTextarea v-model="state.data.personality" class="w-full"/>
+                                    </UFormField>
+                                    <UFormField label="Scenario" description="The setting or situation where the roleplay takes place.">
+                                        <UTextarea v-model="state.data.scenario" class="w-full"/>
+                                    </UFormField>
                                 </UForm>
                             </template>
                             <template #msgs>
-
+                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                                    <UFormField label="First Message" description="This is how your character will introduce themselves.">
+                                        <UTextarea v-model="state.data.first_mes" class="w-full"/>
+                                    </UFormField>
+                                    <UFormField label="Alternate Greetings" description="Additional ways your character might introduce themselves.">
+                                        <CharacterCompStringArrayInputs v-model="card.card.data.alternate_greetings" button-text="Add Alternate Greeting"/>
+                                    </UFormField>
+                                    <UFormField label="Example Messages" description="Example conversation that shows how your character typically responds. <START> tags are added automatically.">
+                                        <CharacterCompStringArrayInputs v-model="card.data.exampleMessages" button-text="Add Example Message"/>
+                                    </UFormField>
+                                </UForm>
                             </template>
                             <template #system>
-
+                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                                    <UFormField label="System Prompt" description="Instructions for the AI on how to roleplay your character.">
+                                        <UTextarea v-model="state.data.system_prompt" class="w-full"/>
+                                    </UFormField>
+                                    <UFormField label="Post-History Instructions" description="Instructions for the AI after it has read the conversation history.">
+                                        <UTextarea v-model="state.data.post_history_instructions" class="w-full"/>
+                                    </UFormField>
+                                </UForm>
                             </template>
                             <template #adv>
-
+                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                                    <UFormField label="Creator Notes" description="Additional notes about your character that aren't part of their description">
+                                        <UTextarea v-model="state.data.creator_notes" class="w-full"/>
+                                    </UFormField>
+                                </UForm>
                             </template>
                         </UTabs>
                     </UCard>

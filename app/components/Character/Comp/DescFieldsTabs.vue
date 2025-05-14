@@ -123,7 +123,7 @@ function moveFieldDown(index: number) {
     <UTabs :items="descTabs" v-model="activeDescTab" size="sm" variant="link">
         <template #props="{ item }">
             <p class="text-muted text-xs mb-2">{{item.description}}</p>
-            <div class="w-full items-center flex gap-2 mb-4 border border-default p-2 rounded-lg">
+            <div class="w-full items-center flex gap-2 mb-4 border border-default p-2 rounded-xl">
                 <div class="flex-grow">
                     <UForm class="grid grid-cols-2 gap-2" :state="pendingField" :validate="validatePendingField">
                         <UFormField name="fieldName" size="sm">
@@ -147,8 +147,8 @@ function moveFieldDown(index: number) {
                     </UDropdownMenu>
                 </div>
             </div>
-            <ScrollAreaRoot >
-                <ScrollAreaViewport class="max-h-96 p-0.5">
+            <ScrollAreaRoot class="rounded-xl border border-default" v-if="(descFields?.length || 0) > 0">
+                <ScrollAreaViewport class="max-h-96 p-2">
                     <div class="grid grid-cols-2 gap-4">
                         <UCard
                             :ui="{
@@ -158,6 +158,7 @@ function moveFieldDown(index: number) {
                             class="w-full"
                             v-for="(f, index) in descFields"
                             variant="subtle"
+                            :key="index"
                         >
                             <template #header>
                                 <div class="flex items-center gap-1.5">

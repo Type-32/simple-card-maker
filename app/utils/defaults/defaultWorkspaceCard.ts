@@ -8,6 +8,7 @@ export default function (ov?: Partial<WorkspaceCard>): WorkspaceCard {
         data: {
             descFields: ov?.data?.descFields || [],
             propertiesFormat: ov?.data?.propertiesFormat != undefined ? ov?.data?.propertiesFormat : true,
+            exampleMessages: ov?.data?.exampleMessages || [],
         },
         card: defaultTavernCard(ov?.card)
     } satisfies WorkspaceCard
