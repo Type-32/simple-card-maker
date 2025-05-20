@@ -40,14 +40,5 @@ export default defineNuxtConfig({
             // Tauri requires a consistent port
             strictPort: true,
         },
-    },
-
-    nitro: {
-        storage: {
-            uploads: {
-                driver: 'fs',
-                base: './public/uploads'
-            }
-        }
     }
 });
