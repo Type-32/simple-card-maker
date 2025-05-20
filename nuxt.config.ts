@@ -49,14 +49,5 @@ export default defineNuxtConfig({
                 base: './public/uploads'
             }
         }
-    },
-
-    image: {
-        providers: {
-            custom: {
-                provider: '~/composables/providers/useCustomImageProvider',
-                options: {}
-            }
-        }
     }
 });
