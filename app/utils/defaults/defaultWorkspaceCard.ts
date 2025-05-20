@@ -10,6 +10,6 @@ export default function (ov?: Partial<WorkspaceCard>): WorkspaceCard {
             propertiesFormat: ov?.data?.propertiesFormat != undefined ? ov?.data?.propertiesFormat : true,
             exampleMessages: ov?.data?.exampleMessages || [],
         },
-        card: defaultTavernCard(ov?.card)
+        card: defaultTavernCard(ov?.card),
     } satisfies WorkspaceCard
 }

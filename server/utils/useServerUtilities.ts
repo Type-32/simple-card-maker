@@ -1,15 +1,4 @@
-import {exists, mkdir} from "@tauri-apps/plugin-fs";
-import {BaseDirectory} from "@tauri-apps/api/path";
-
-export function useDirs() {
-    async function initDirs() {
-        if(!(await exists('', {baseDir: BaseDirectory.AppData})))
-            await mkdir('', {baseDir: BaseDirectory.AppData})
-
-        if(!(await exists('', {baseDir: BaseDirectory.AppConfig})))
-            await mkdir('', {baseDir: BaseDirectory.AppConfig})
-    }
-
+export function useServerUtilities() {
     /**
      * Joins all given path segments together using the platform-specific separator as a delimiter,
      * then normalizes the resulting path.
@@ -104,11 +93,9 @@ export function useDirs() {
 
         return normalized || '.';
     }
-
     return {
-        initDirs,
-        join,
         isWindows,
+        join,
         normalizePath
     }
 }

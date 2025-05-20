@@ -2,17 +2,12 @@
 import {useWorkspace} from "~/composables/workspace/useWorkspace";
 import {useCharacter} from "~/composables/editing/useCharacter";
 import type {WorkspaceCard} from "~/types/maker.types";
-import type { TabsItem } from '@nuxt/ui'
+import type {FormError} from '@nuxt/ui'
 import {useConfig} from "~/composables/config/useConfig";
-import type {FieldValueType} from "~/types/fields.types";
 import {useQuickToasts} from "~/composables/utility/useQuickToasts";
-import * as z from 'zod';
-import type { FormError, FormSubmitEvent } from '@nuxt/ui'
 import type {TavernCardV2} from "~/types/tavern.types";
 import defaultTavernCard from "~/utils/defaults/defaultTavernCard";
 import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
-import {undefined} from "zod";
-import {ScrollAreaRoot, ScrollAreaScrollbar, ScrollAreaThumb, ScrollAreaViewport} from "reka-ui";
 
 definePageMeta({
     layout: 'workspace-tabs-layout'
@@ -24,7 +19,7 @@ const $cfg = useConfig()
 const $qt = useQuickToasts()
 
 const state = reactive<TavernCardV2>(defaultTavernCard())
-const saving = ref(false), hasChanges = ref(false)
+const saving = ref(false), hasChanges = ref(false), imageUrl = ref('https://picsum.photos/800/600')
 
 const validate = (state: TavernCardV2): FormError[] => {
     const errors = []
@@ -41,8 +36,6 @@ const categoryTabs = [
     {label: 'Advanced', slot: 'adv' as const},
 ]
 
-
-
 onMounted(() => {
     card.value = {
         ...card.value,
@@ -52,6 +45,8 @@ onMounted(() => {
         ...state.data,
         ...card.value?.card.data
     }
+
+    imageUrl.value = coverImageAssetUrl()
 })
 
 watch([state, card], ([newState, newCard]) => {
@@ -94,13 +89,38 @@ async function saveCharacter() {
 function backToHome() {
     $ch.backToWorkspace()
 }
+
+function coverImageAssetUrl() {
+    return unref(card).data.coverImageAsset != null ? `/api/assets/${unref(card).data.coverImageAsset?.parentWorkspaceId}/${unref(card).data.coverImageAsset?.id}?v=${Date.now()}` : 'https://picsum.photos/800/600'
+}
+
+async function setCardImage() {
+    try {
+        card.value.data.coverImageAsset = await $ch.uploadAndSetCardImage(unref($ch.currentCharacterId))
+        imageUrl.value = coverImageAssetUrl()
+    } catch (e: any) {
+        console.log(e)
+        $qt.error('Failed to Upload Image', e)
+    }
+}
+
+// const loadImage = async () => {
+//     const response = await $fetch(coverImageAssetUrl() || '');
+//     const blob = await response as Blob;
+//     imageUrl.value = URL.createObjectURL(blob);
+// };
+//
+// // Call this after upload
+// const refreshImage = async () => {
+//     await loadImage();
+// };
 </script>
 
 <template>
     <div>
         <div class="w-full h-full overflow-visible py-2 px-4 my-9">
             <div class="grid grid-cols-7 gap-4 overflow-visible">
-                <div class="col-span-2 h-full top-0">
+                <div class="col-span-2 h-fit top-0">
                     <UCard>
                         <template #header>
                             <div class="w-full flex items-center justify-between gap-4">
@@ -123,7 +143,11 @@ function backToHome() {
                         </template>
                         <template #default>
                             <div class="grid grid-cols-1 gap-4">
-                                <NuxtImg src="https://picsum.photos/800/600" class="rounded-lg"/>
+                                <UDropdownMenu :items="[
+                                    [{label: 'Upload New Image', icon: 'lucide:upload', onSelect() { setCardImage() }}]
+                                ]">
+                                    <img :src="unref(imageUrl)" alt="Card" class="rounded-lg object-contain hover:cursor-pointer hover:opacity-90 transition duration-300"/>
+                                </UDropdownMenu>
                                 <UForm :state :validate class="grid grid-cols-1 gap-4">
                                     <UFormField name="name" required label="Name" size="lg">
                                         <UInput v-model="state.data.name" class="w-full"/>

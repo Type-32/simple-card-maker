@@ -41,4 +41,22 @@ export default defineNuxtConfig({
             strictPort: true,
         },
     },
+
+    nitro: {
+        storage: {
+            uploads: {
+                driver: 'fs',
+                base: './public/uploads'
+            }
+        }
+    },
+
+    image: {
+        providers: {
+            custom: {
+                provider: '~/composables/providers/useCustomImageProvider',
+                options: {}
+            }
+        }
+    }
 });

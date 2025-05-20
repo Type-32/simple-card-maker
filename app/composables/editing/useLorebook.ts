@@ -5,7 +5,7 @@ import type {PossiblyRef} from "~/types/utility.types";
 
 export function useLorebook() {
     const $qt = useQuickToasts();
-    const { loadedWorkspace, writeWorkspace } = useWorkspace();
+    const { loadedWorkspace, writeWorkspace, saveWorkspace, directToWorkspace } = useWorkspace();
 
     const $currentBookId = computed(() => useRoute().params.bookId as string);
     const $currentBook = computed({
@@ -59,10 +59,23 @@ export function useLorebook() {
         return wks.books.find(book => book.id === id);
     }
 
+    function backToWorkspace() {
+        const wks = unref(loadedWorkspace)
+        if (!wks) {
+            $qt.error("Error Returning to Workspace", "Your workspace had managed to somehow... disappear. Please restart the application to make sure that no further changes are lost.")
+            return
+        }
+        saveWorkspace().then(r => {
+            $qt.info("Auto Save", "Saved Workspace Automatically.")
+        })
+        directToWorkspace(wks.id)
+    }
+
     return {
         currentBookId: $currentBookId,
         currentBook: $currentBook,
         writeBook,
-        getBook
+        getBook,
+        backToWorkspace
     };
 }

@@ -152,7 +152,7 @@ function moveFieldDown(index: number) {
                     <div class="grid grid-cols-2 gap-4">
                         <UCard
                             :ui="{
-                        body: 'p-3 m-0 sm:p-3',
+                        body: 'p-3 m-0 sm:p-3 h-fit',
                         header: 'p-2 sm:p-2'
                     }"
                             class="w-full"
@@ -183,10 +183,10 @@ function moveFieldDown(index: number) {
                                         :items="f.fieldValue as string[]"
                                         multiple create-item
                                         @create="(tagstring: string) => {
-                                    if (typeof(f.fieldValue) != typeof([] as string[]) || !f.fieldValue)
-                                        f.fieldValue = [] as string[]
-                                    (f.fieldValue as string[]).push(tagstring)
-                                }"
+                                            if (typeof(f.fieldValue) != typeof([] as string[]) || !f.fieldValue)
+                                                f.fieldValue = [] as string[]
+                                            (f.fieldValue as string[]).push(tagstring)
+                                        }"
                                         v-model="f.fieldValue as string[]"
                                         class="w-full input-full justify-none"
                                         v-else-if="f.fieldType == 'tags'"/>

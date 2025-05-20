@@ -10,6 +10,7 @@ export default function (data?: Partial<Workspace>): Workspace {
         tree: {
             books: [],
             cards: [],
-        } satisfies WorkspaceTree
+        } satisfies WorkspaceTree,
+        assets: [],
     } satisfies Workspace
 }

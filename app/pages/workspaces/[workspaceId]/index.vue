@@ -2,6 +2,7 @@
 import {useWorkspace} from "~/composables/workspace/useWorkspace";
 import type {TabsItem} from "@nuxt/ui";
 import {WorkspaceModalRenameWorkspace, CharacterModalCreateCharacter, LorebookModalCreateLorebook} from "#components";
+import type {WorkspaceCard} from "~/types/maker.types";
 
 definePageMeta({
     layout: 'workspace-tabs-layout'
@@ -24,6 +25,10 @@ const $ovl = useOverlay()
 const renameModal = $ovl.create(WorkspaceModalRenameWorkspace)
 const createCharModal = $ovl.create(CharacterModalCreateCharacter)
 const createLorebookModal = $ovl.create(LorebookModalCreateLorebook)
+
+function coverImageAssetUrl(card: WorkspaceCard) {
+    return unref(card).data.coverImageAsset != null ? `/api/assets/${unref(card).data.coverImageAsset?.parentWorkspaceId}/${unref(card).data.coverImageAsset?.id}?v=${Date.now()}` : 'https://picsum.photos/800/600'
+}
 </script>
 
 <template>
@@ -72,7 +77,9 @@ const createLorebookModal = $ovl.create(LorebookModalCreateLorebook)
                             >
                                 <template #default>
                                     <div class="flex flex-col items-center justify-center gap-2">
-                                        <UAvatar :alt="w.card.data.name || 'Unknown Character'" class="size-32"/>
+                                        <UAvatar :alt="'Unknown Character'" class="size-32">
+                                            <img :src="coverImageAssetUrl(w)" class="object-contain"/>
+                                        </UAvatar>
                                         <strong class="text-lg font-medium">{{w.card.data.name || 'Unknown Character'}}</strong>
                                     </div>
                                 </template>
@@ -81,12 +88,8 @@ const createLorebookModal = $ovl.create(LorebookModalCreateLorebook)
                                         <UButton size="sm" icon="lucide:pen-line" label="Edit" @click="$wk.directToCharacter(w.id)"/>
                                         <UDropdownMenu
                                             :items="[
-                                                [
-                                                    {label: 'Rename', icon: 'lucide:pen'}
-                                                ],
-                                                [
-                                                    {label: 'Delete', color: 'error', icon: 'lucide:trash-2'}
-                                                ]
+                                                [{label: 'Rename', icon: 'lucide:pen'}],
+                                                [{label: 'Delete', color: 'error', icon: 'lucide:trash-2'}]
                                             ]"
                                         >
                                             <UButton size="sm" variant="ghost" icon="lucide:ellipsis"/>
@@ -100,7 +103,43 @@ const createLorebookModal = $ovl.create(LorebookModalCreateLorebook)
                         </div>
                     </template>
                     <template #lorebooks="{ item }">
-
+                        <div class="w-full grid grid-cols-3 gap-4 mt-5" v-if="unref($wk.loadedWorkspace)?.books.length || 0 > 0">
+                            <UCard
+                                v-for="(w, index) in unref($wk.loadedWorkspace)?.books"
+                                :key="index"
+                                :ui="{
+                                    footer: 'p-3 sm:p-3',
+                                    body: 'p-4 sm:p-4'
+                                }"
+                                variant="subtle"
+                            >
+                                <template #default>
+                                    <div class="flex flex-col items-start justify-center gap-2 select-none">
+                                        <div class="flex items-center justify-start gap-2">
+                                            <UIcon name="lucide:book-open"/>
+                                            <strong class="text-lg font-medium">{{w.book.name || 'Untitled Lorebook'}}</strong>
+                                        </div>
+                                        <small class="text-sm text-dimmed">{{w.book.description || 'No description provided.'}}</small>
+                                    </div>
+                                </template>
+                                <template #footer>
+                                    <div class="items-center flex justify-between">
+                                        <UButton size="sm" icon="lucide:pen-line" label="Edit" @click="$wk.directToLorebook(w.id)"/>
+                                        <UDropdownMenu
+                                            :items="[
+                                                [{label: 'Rename', icon: 'lucide:pen'}],
+                                                [{label: 'Delete', color: 'error', icon: 'lucide:trash-2'}]
+                                            ]"
+                                        >
+                                            <UButton size="sm" variant="ghost" icon="lucide:ellipsis"/>
+                                        </UDropdownMenu>
+                                    </div>
+                                </template>
+                            </UCard>
+                        </div>
+                        <div class="w-full p-5 grid grid-rows-1 mt-5" v-else>
+                            <div class="text-center text-muted text-sm">No Lorebooks in this Workspace.</div>
+                        </div>
                     </template>
                 </UTabs>
             </div>

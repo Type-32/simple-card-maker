@@ -6,6 +6,9 @@ import {useMakerIO} from "~/composables/maker/useMakerIO";
 import {useUUID} from "~/composables/utility/useUUID";
 import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
 import defaultWorkspaceBook from "~/utils/defaults/defaultWorkspaceBook";
+import defaultWorkspaceAssetEntry from "~/utils/defaults/defaultWorkspaceAssetEntry";
+import {join} from "@tauri-apps/api/path";
+import {type DialogFilter, open} from "@tauri-apps/plugin-dialog"
 
 export function useWorkspace() {
     const $qt = useQuickToasts()
@@ -100,12 +103,46 @@ export function useWorkspace() {
             await directToLorebook(temp.id)
     }
 
+    async function uploadAsset(fileFormatFilters?: DialogFilter[]) {
+        const wks = unref($loadedWorkspace)
+        if (!wks) {
+            $qt.error("Uploading Asset", `The Workspace you are trying to upload an asset to does not exist.`);
+            return;
+        }
+
+        const filePath = await open({
+            title: 'Select File to Upload',
+            filters: fileFormatFilters
+        })
+
+        if (!filePath)
+            return;
+
+        const relativeCopiedPath = await $mio.copyFileToWorkspaceAssetsFolder(wks.id, filePath)
+        console.log(wks.id, relativeCopiedPath.newFileId)
+        const assetEntry = defaultWorkspaceAssetEntry({
+            reference: {
+                id: relativeCopiedPath.newFileId,
+                parentWorkspaceId: wks.id,
+            },
+            relativePath: relativeCopiedPath.relativePath
+        })
+        writeWorkspace({
+            assets: [
+                ...wks.assets,
+                assetEntry
+            ]
+        })
+
+        return assetEntry;
+    }
+
     function directToCharacter(characterId: string) {
-        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/${characterId}`)
+        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/character/${characterId}`)
     }
 
     function directToLorebook(lorebookId: string) {
-        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/${lorebookId}`)
+        return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/lorebook/${lorebookId}`)
     }
 
     return {
@@ -116,6 +153,7 @@ export function useWorkspace() {
         redirectIfExists,
         newCharacter,
         newLorebook,
+        uploadAsset,
         directToCharacter,
         directToLorebook,
         loadedWorkspace: $loadedWorkspace,

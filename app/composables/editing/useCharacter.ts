@@ -2,10 +2,11 @@ import type {WorkspaceCard} from "~/types/maker.types";
 import type {PossiblyRef} from "~/types/utility.types";
 import {useQuickToasts} from "~/composables/utility/useQuickToasts";
 import {useWorkspace} from "~/composables/workspace/useWorkspace";
+import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
 
 export function useCharacter() {
     const $qt = useQuickToasts();
-    const { loadedWorkspace, writeWorkspace, saveWorkspace, directToWorkspace } = useWorkspace();
+    const { loadedWorkspace, writeWorkspace, saveWorkspace, directToWorkspace, uploadAsset } = useWorkspace();
 
     const $currentCharacterId = computed(() => useRoute().params.characterId as string);
     const $currentCharacter = computed({
@@ -70,11 +71,27 @@ export function useCharacter() {
         directToWorkspace(wks.id)
     }
 
+    async function uploadAndSetCardImage(characterId: PossiblyRef<string>) {
+        const entry = await uploadAsset([{ name: 'Images', extensions: ['png', 'jpeg', 'jpg', 'webp'] }])
+        if (entry) {
+            const id = unref(characterId)
+            writeCharacterCard(id, {
+                data: {
+                    ...defaultWorkspaceCard().data,
+                    ...unref($currentCharacter)?.data,
+                    coverImageAsset: entry.reference
+                }
+            })
+            return entry.reference
+        }
+    }
+
     return {
         currentCharacterId: readonly($currentCharacterId),
         currentCharacter: $currentCharacter,
         writeCharacterCard,
         getCharacterCard,
-        backToWorkspace
+        backToWorkspace,
+        uploadAndSetCardImage
     };
 }

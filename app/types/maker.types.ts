@@ -7,6 +7,7 @@ export type Workspace = {
     cards: WorkspaceCard[],
     books: WorkspaceBook[],
     tree: WorkspaceTree,
+    assets: WorkspaceAssetEntry[],
 }
 
 export type WorkspaceCard = {
@@ -16,7 +17,8 @@ export type WorkspaceCard = {
         propertiesFormat: boolean, // default should be true.
         descFields: FieldValueType[], // the stored values should not override the TavernCard description field.
         linkedLorebook?: string // The linked lorebook ID.
-        exampleMessages: string[]
+        exampleMessages: string[],
+        coverImageAsset?: WorkspaceAssetReference,
     }
 }
 
@@ -37,4 +39,14 @@ export type WorkspaceDirEntry = {
     parentId: string, // refers to the parent WorkspaceDirEntry id.
     referringId: string, // refers to the workspace card or book entry IDs.
     children: WorkspaceDirEntry[]
+}
+
+export type WorkspaceAssetReference = {
+    id: string;
+    parentWorkspaceId: string;
+}
+
+export type WorkspaceAssetEntry = {
+    reference: WorkspaceAssetReference;
+    relativePath: string;
 }

@@ -1,12 +1,12 @@
 import {BaseDirectory, join} from "@tauri-apps/api/path"
-import {exists, mkdir, readDir, readTextFile, remove, writeTextFile} from "@tauri-apps/plugin-fs"
+import {copyFile, exists, mkdir, readDir, readTextFile, remove, writeTextFile} from "@tauri-apps/plugin-fs"
 import {useUUID} from "~/composables/utility/useUUID";
 import type {Workspace} from "~/types/maker.types";
 import {useDirs} from "~/composables/utility/useDirs";
 
 export function useMakerIO(){
     const BUFFER_FOLDER = "workspace_buffer"
-    const IMAGES_FOLDER = "images"
+    const ASSETS_FOLDER = "assets"
     const WORKSPACE_FILE = "workspace.json"
 
     async function createWorkspaceBuffer(name: string) {
@@ -22,7 +22,7 @@ export function useMakerIO(){
         }
 
         await mkdir(bufferPath, {baseDir: BaseDirectory.AppData, recursive: true})
-        await mkdir(await join(bufferPath, IMAGES_FOLDER), {baseDir: BaseDirectory.AppData, recursive: true})
+        await mkdir(await join(bufferPath, ASSETS_FOLDER), {baseDir: BaseDirectory.AppData, recursive: true})
 
         const workspaceData = {
             id: workspaceId,
@@ -32,7 +32,8 @@ export function useMakerIO(){
             tree: {
                 books: [],
                 cards: [],
-            }
+            },
+            assets: [],
         } satisfies Workspace
 
         await writeTextFile(await join(bufferPath, WORKSPACE_FILE), JSON.stringify(workspaceData), {baseDir: BaseDirectory.AppData})
@@ -77,11 +78,28 @@ export function useMakerIO(){
         await writeTextFile(await join(bufferPath, WORKSPACE_FILE), JSON.stringify(workspace), {baseDir: BaseDirectory.AppData})
     }
 
+    async function copyFileToWorkspaceAssetsFolder(workspaceId: string, originFilePath: string) {
+        const suffix = originFilePath.split('.')[originFilePath.split('.').length - 1] || ''
+        const id = useUUID()
+
+        if(!(await exists(await join(BUFFER_FOLDER, workspaceId, ASSETS_FOLDER), {baseDir: BaseDirectory.AppData})))
+            await mkdir(await join(BUFFER_FOLDER, workspaceId, ASSETS_FOLDER), {baseDir: BaseDirectory.AppData})
+
+        const relativePath = await join(BUFFER_FOLDER, workspaceId, ASSETS_FOLDER, `${id}.${suffix}`)
+        await copyFile(originFilePath, relativePath, {toPathBaseDir: BaseDirectory.AppData})
+        return {
+            relativePath: relativePath,
+            newFileName: `${id}.${suffix}`,
+            newFileId: id,
+        }
+    }
+
     return {
         createWorkspaceBuffer,
         loadWorkspaceFromBuffer,
         loadWorkspaceFromFile,
         deleteWorkspacesFromBuffer,
-        writeWorkspaceToBuffer
+        writeWorkspaceToBuffer,
+        copyFileToWorkspaceAssetsFolder
     }
 }
