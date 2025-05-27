@@ -202,6 +202,10 @@ const _positionSelections = [
     { label: 'Before Character', value: 'before_char' },
     { label: 'After Character', value: 'after_char' },
 ]
+
+function exportLorebook(option?: "v2_json" | "workspace") {
+    $wk.exportLorebook(unref(book), option)
+}
 </script>
 
 <template>
@@ -222,7 +226,18 @@ const _positionSelections = [
                     <div class="text-muted text-sm">Modify your lorebook.</div>
                 </div>
                 <div>
-                    <UButton :loading="hasChanges" icon="lucide:save" :label="hasChanges ? 'Saving...' : 'Auto-Save'"/>
+                    <UDropdownMenu :items="[
+                        {
+                            label: 'V2 Spec',
+                            onSelect() { exportLorebook('v2_json') }
+                        },
+                        {
+                            label: 'Workspace Lorebook',
+                            onSelect() { exportLorebook('workspace') }
+                        }
+                    ]">
+                        <UButton :loading="hasChanges" icon="lucide:arrow-up-from-line" label="Export Character"/>
+                    </UDropdownMenu>
                 </div>
             </div>
             <div class="grid grid-cols-7 gap-4 overflow-visible">

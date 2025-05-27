@@ -21,22 +21,25 @@ export function useConversions() {
                     tags.forEach((tag, tagind, tagarr) => {
                         tagsString += tagarr.length - 1 >= tagind ? tag : `${tag}, `
                     })
-                    propertiesString += `{{char}} ${value.fieldName}(${tagsString})\n`
+                    propertiesString += `{{char}} ${value.fieldName}(${tagsString})`
                 } else {
-                    propertiesString += `{{char}} ${value.fieldName}(${value.fieldValue})\n`
+                    propertiesString += `{{char}} ${value.fieldName}(${value.fieldValue})`
                 }
+
+                if (!(index >= array.length - 1)) propertiesString += '\n'
             })
             descriptionString = propertiesString + "]"
         }
 
         if (defaultedCard.data.exampleMessages.length > 0) {
             defaultedCard.data.exampleMessages.forEach((value) => {
-                exampleMessagesString += `<START>\n${value}\n<START>`
+                exampleMessagesString += `<START>\n${value}\n<START>\n`
             })
         }
 
         if (defaultedCard.data.linkedLorebook) {
             tavernCard.data.character_book = useWorkspace().getLorebook(defaultedCard.data.linkedLorebook)?.book
+            console.log(tavernCard.data.character_book)
         }
 
         tavernCard.data.description = descriptionString

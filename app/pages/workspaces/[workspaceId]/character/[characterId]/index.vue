@@ -149,16 +149,16 @@ function exportCharacter(option?: "v2_json" | "v2_png" | "workspace") {
                         {
                             label: 'V2 Spec',
                             children: [
-                                { label: 'PNG', icon: 'lucide:image', onSelect() { exportCharacter('v2_png')} },
+                                { label: 'PNG', icon: 'lucide:image', onSelect() { exportCharacter('v2_png')}, disabled: card.data.coverImageAsset == undefined },
                                 { label: 'JSON', icon: 'lucide:code', onSelect() { exportCharacter('v2_json')} },
                             ]
                         },
                         {
                             label: 'Workspace Card',
-                            onSelect() { exportCharacter('workspace')}
+                            onSelect() { exportCharacter('workspace') }
                         }
                     ]">
-                        <UButton :loading="hasChanges" icon="lucide:export" label="Export Character"/>
+                        <UButton :loading="hasChanges" icon="lucide:arrow-up-from-line" label="Export Character"/>
                     </UDropdownMenu>
                 </div>
             </div>
