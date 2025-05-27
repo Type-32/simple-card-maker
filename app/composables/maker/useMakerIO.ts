@@ -136,7 +136,7 @@ export function useMakerIO(){
             }
 
             // Read the source image as a binary file (ArrayBuffer)
-            const imageArrayBuffer = await readFile(sourceImagePath, {baseDir: BaseDirectory.AppData});
+            const imageArrayBuffer = await readFile(`${sourceImagePath}.png`, {baseDir: BaseDirectory.AppData});
 
             // Prepare the JSON data (TavernCardV2)
             const characterJsonString = JSON.stringify(v2CardData);
@@ -147,8 +147,8 @@ export function useMakerIO(){
             const newPngDataUint8Array = Png.Generate(imageArrayBuffer, characterJsonString, keyword);
 
             // Determine the output file name and path
-            const outputFileName = newFileName || `character_card_${useUUID()}.png`;
-            const outputAbsoluteFilePath = await join(targetAbsoluteDirPath, outputFileName);
+            const outputFileName = newFileName || `character_card_${sourceAssetReference.id}.png`;
+            const outputAbsoluteFilePath = targetAbsoluteDirPath.endsWith('.png') ? targetAbsoluteDirPath : await join(targetAbsoluteDirPath, outputFileName);
 
             // Write the new PNG data to the target directory
             await writeFile(outputAbsoluteFilePath, newPngDataUint8Array);

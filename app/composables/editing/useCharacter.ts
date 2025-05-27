@@ -72,7 +72,7 @@ export function useCharacter() {
     }
 
     async function uploadAndSetCardImage(characterId: PossiblyRef<string>) {
-        const entry = await uploadAsset([{ name: 'Images', extensions: ['png', 'jpeg', 'jpg', 'webp'] }])
+        const entry = await uploadAsset([{ name: 'Images', extensions: ['png'] }])
         if (entry) {
             const id = unref(characterId)
             writeCharacterCard(id, {

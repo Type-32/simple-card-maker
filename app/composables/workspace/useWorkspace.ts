@@ -169,8 +169,10 @@ export function useWorkspace() {
 
             await $mio.createV2JsonCardToDir(tavernCard, saveDirFile)
         } else if (option == 'v2_png') {
-            if (!card.data.coverImageAsset)
+            if (!card.data.coverImageAsset) {
+                $qt.error('Failed to Export Character', 'To export as a PNG V2 Spec Card, you need to upload a PNG image file!')
                 return
+            }
 
             const saveDirFile = await save({
                 filters: [{
@@ -196,6 +198,8 @@ export function useWorkspace() {
 
             await $mio.writeTextFileToDir(JSON.stringify(card), saveDirFile)
         }
+
+        $qt.success('Character Card is successfully exported.')
     }
 
     async function exportLorebook(book: WorkspaceBook, option?: 'v2_json' | 'workspace') {
@@ -224,6 +228,8 @@ export function useWorkspace() {
 
             await $mio.writeTextFileToDir(JSON.stringify(book), saveDirFile)
         }
+
+        $qt.success('Lorebook is successfully exported.')
     }
 
     return {

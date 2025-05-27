@@ -121,6 +121,9 @@ function jumpToEditLorebook() {
     $wk.directToLorebook(link || '')
 }
 
+function exportCharacter(option?: "v2_json" | "v2_png" | "workspace") {
+    $wk.exportCharacter(unref(card), option)
+}
 </script>
 
 <template>
@@ -140,8 +143,23 @@ function jumpToEditLorebook() {
                     <div class="text-2xl font-bold">Editing Character "{{state.data.name}}"</div>
                     <div class="text-muted text-sm">Modify your character.</div>
                 </div>
-                <div>
-                    <UButton :loading="hasChanges" icon="lucide:save" :label="hasChanges ? 'Saving...' : 'Auto-Save'"/>
+                <div class="flex items-center gap-1">
+                    <UButton :loading="hasChanges" variant="outline" icon="lucide:save" :label="hasChanges ? 'Saving...' : 'Auto-Save'"/>
+                    <UDropdownMenu :items="[
+                        {
+                            label: 'V2 Spec',
+                            children: [
+                                { label: 'PNG', icon: 'lucide:image', onSelect() { exportCharacter('v2_png')} },
+                                { label: 'JSON', icon: 'lucide:code', onSelect() { exportCharacter('v2_json')} },
+                            ]
+                        },
+                        {
+                            label: 'Workspace Card',
+                            onSelect() { exportCharacter('workspace')}
+                        }
+                    ]">
+                        <UButton :loading="hasChanges" icon="lucide:export" label="Export Character"/>
+                    </UDropdownMenu>
                 </div>
             </div>
             <div class="grid grid-cols-7 gap-4 overflow-visible">

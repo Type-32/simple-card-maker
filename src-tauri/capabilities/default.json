@@ -22,10 +22,12 @@
     "fs:allow-lstat",
     "fs:allow-mkdir",
     "fs:allow-open",
+    "fs:allow-read",
     "fs:allow-appconfig-read-recursive",
     "fs:allow-appconfig-write-recursive",
     "fs:allow-appdata-write-recursive",
     "fs:allow-appdata-read-recursive",
+    "fs:allow-appdata-read",
     "fs:default",
     "dialog:default",
     "core:window:allow-start-dragging",
@@ -33,6 +35,26 @@
     "os:default",
     {
       "identifier": "fs:allow-exists",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:allow-read",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:read-all",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:read-files",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:write-all",
+      "allow": [{ "path": "$APPDATA/**" }]
+    },
+    {
+      "identifier": "fs:write-files",
       "allow": [{ "path": "$APPDATA/**" }]
     },
     { "identifier": "fs:allow-exists", "allow": [ { "path": "**/**" } ] }
