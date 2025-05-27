@@ -1,4 +1,9 @@
+import * as path from 'path';
+import * as os from 'os';
+import * as fs from 'fs';
+
 export function useServerUtilities() {
+
     /**
      * Joins all given path segments together using the platform-specific separator as a delimiter,
      * then normalizes the resulting path.
@@ -93,9 +98,48 @@ export function useServerUtilities() {
 
         return normalized || '.';
     }
+
+    /**
+     * Get the AppData path for the current platform and ensure it exists.
+     * Optionally includes an application-specific subdirectory.
+     *
+     * @param appName - Optional name of the application to append to the AppData path.
+     * @returns The absolute path to the AppData or AppData/appName directory.
+     */
+    function getAppDataPath(appName?: string): string {
+        let appDataPath: string;
+
+        switch (process.platform) {
+            case 'win32':
+                // windows
+                appDataPath =
+                    process.env.APPDATA || path.join(process.env.USERPROFILE || 'User', 'AppData', 'Roaming');
+                break;
+            case 'darwin':
+                // macOS
+                appDataPath = path.join(os.homedir(), 'Library', 'Application Support');
+                break;
+            case 'linux':
+                // linux
+                appDataPath = path.join(os.homedir(), '.config');
+                break;
+            default:
+                throw new Error(`Unsupported platform: ${process.platform}`);
+        }
+
+        if (appName)
+            appDataPath = path.join(appDataPath, appName);
+
+        // Ensure the directory exists; create it if it doesn't
+        fs.mkdirSync(appDataPath, { recursive: true });
+
+        return appDataPath;
+    }
+
     return {
         isWindows,
         join,
-        normalizePath
+        normalizePath,
+        getAppDataPath
     }
 }

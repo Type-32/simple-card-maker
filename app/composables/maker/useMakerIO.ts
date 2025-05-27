@@ -1,8 +1,20 @@
 import {BaseDirectory, join} from "@tauri-apps/api/path"
-import {copyFile, exists, mkdir, readDir, readTextFile, remove, writeTextFile} from "@tauri-apps/plugin-fs"
+import {
+    copyFile,
+    exists,
+    mkdir,
+    readDir,
+    readFile,
+    readTextFile,
+    remove,
+    writeFile,
+    writeTextFile
+} from "@tauri-apps/plugin-fs"
 import {useUUID} from "~/composables/utility/useUUID";
-import type {Workspace} from "~/types/maker.types";
+import type {Workspace, WorkspaceAssetReference} from "~/types/maker.types";
 import {useDirs} from "~/composables/utility/useDirs";
+import type {TavernCardV2} from "~/types/tavern.types";
+import {Png} from "~/utils/converts/png-embed";
 
 export function useMakerIO(){
     const BUFFER_FOLDER = "workspace_buffer"
@@ -94,12 +106,74 @@ export function useMakerIO(){
         }
     }
 
+    async function writeTextFileToDir(content: string, absoluteDirPath: string) {
+        await writeTextFile(absoluteDirPath, content)
+    }
+
+    async function createV2JsonCardToDir(
+        v2CardData: TavernCardV2,
+        targetAbsoluteDirPath: string,
+    ) {
+        await writeTextFile(targetAbsoluteDirPath, JSON.stringify(v2CardData))
+    }
+
+    async function createV2PngCardToDir(
+        sourceAssetReference: WorkspaceAssetReference,
+        v2CardData: TavernCardV2,
+        targetAbsoluteDirPath: string, // The absolute path to the directory where the new PNG will be saved
+        newFileName?: string // Optional: if not provided, generate one
+    ) {
+        try {
+            const sourceImagePath = await join(BUFFER_FOLDER, sourceAssetReference.parentWorkspaceId, ASSETS_FOLDER, sourceAssetReference.id);
+
+            if (!(
+                await exists(`${sourceImagePath}.png`, {baseDir: BaseDirectory.AppData}) ||
+                await exists(`${sourceImagePath}.jpg`, {baseDir: BaseDirectory.AppData}) ||
+                await exists(`${sourceImagePath}.jpeg`, {baseDir: BaseDirectory.AppData}) ||
+                await exists(`${sourceImagePath}.webp`, {baseDir: BaseDirectory.AppData}))
+            ) {
+                throw new Error(`Source image not found at: ${sourceImagePath}`);
+            }
+
+            // Read the source image as a binary file (ArrayBuffer)
+            const imageArrayBuffer = await readFile(sourceImagePath, {baseDir: BaseDirectory.AppData});
+
+            // Prepare the JSON data (TavernCardV2)
+            const characterJsonString = JSON.stringify(v2CardData);
+
+            // Use the Png.Generate utility to embed the JSON
+            // The V2 spec often uses "chara" as the keyword. Confirm this.
+            const keyword = "chara"; // Or whatever the V2 spec dictates
+            const newPngDataUint8Array = Png.Generate(imageArrayBuffer, characterJsonString, keyword);
+
+            // Determine the output file name and path
+            const outputFileName = newFileName || `character_card_${useUUID()}.png`;
+            const outputAbsoluteFilePath = await join(targetAbsoluteDirPath, outputFileName);
+
+            // Write the new PNG data to the target directory
+            await writeFile(outputAbsoluteFilePath, newPngDataUint8Array);
+
+            console.log(`V2 PNG Character Card created at: ${outputAbsoluteFilePath}`);
+            return {
+                filePath: outputAbsoluteFilePath,
+                fileName: outputFileName,
+            };
+
+        } catch (error) {
+            console.error("Error creating V2 PNG card:", error);
+            throw error;
+        }
+    }
+
     return {
         createWorkspaceBuffer,
         loadWorkspaceFromBuffer,
         loadWorkspaceFromFile,
         deleteWorkspacesFromBuffer,
         writeWorkspaceToBuffer,
-        copyFileToWorkspaceAssetsFolder
+        copyFileToWorkspaceAssetsFolder,
+        writeTextFileToDir,
+        createV2PngCardToDir,
+        createV2JsonCardToDir
     }
 }

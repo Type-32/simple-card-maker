@@ -32,6 +32,13 @@ const breadcrumbs = computed(() => {
             slot: 'text' as const
         })
 
+    if (unref($lb.currentBookId))
+        items.push({
+            label: unref($lb.currentBook)?.book?.name,
+            icon: 'lucide:book',
+            slot: 'text' as const
+        })
+
     return items
 })
 </script>

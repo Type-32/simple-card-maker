@@ -2,38 +2,30 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineEventHandler, getRouterParam, createError, setResponseHeader } from 'h3';
-
-// Helper to get the app data directory path
-function getAppDataDir() {
-    switch (process.platform) {
-        case 'win32':
-            return process.env.APPDATA || path.join(process.env.USERPROFILE || '', 'AppData', 'Roaming');
-        case 'darwin':
-            return path.join(process.env.HOME || '', 'Library', 'Application Support', 'dev.ctrl-neo.simple-card-maker');
-        default:
-            return process.env.XDG_DATA_HOME || path.join(process.env.HOME || '', '.local', 'share');
-    }
-}
+import {useServerUtilities} from "~~/server/utils/useServerUtilities";
 
 export default defineEventHandler(async (event) => {
+    const $util = useServerUtilities()
+
     try {
         const workspaceId = getRouterParam(event, "workspaceId") || '';
         const assetId = getRouterParam(event, "assetId") || '';
         const BUFFER_FOLDER = "workspace_buffer";
         const ASSETS_FOLDER = "assets";
+        const APP_ID = 'dev.ctrl-neo.simple-card-maker'
 
         // Construct paths
-        const appDataDir = getAppDataDir();
+        const appDataDir = $util.getAppDataPath(APP_ID);
         const assetsFolderPath = path.join(appDataDir, BUFFER_FOLDER, workspaceId, ASSETS_FOLDER);
         const assetBasePath = path.join(assetsFolderPath, assetId);
 
-        console.log('Looking for assets in:', assetsFolderPath);
-        console.log('Asset base path:', assetBasePath);
+        // console.log('Looking for assets in:', assetsFolderPath);
+        // console.log('Asset base path:', assetBasePath);
 
         // Check if assets folder exists
         try {
             await fs.access(assetsFolderPath);
-            console.log('Assets folder exists');
+            // console.log('Assets folder exists');
         } catch (err) {
             console.error('Assets folder access error:', err);
             return createError({
@@ -48,21 +40,21 @@ export default defineEventHandler(async (event) => {
 
         for (const ext of extensions) {
             const testPath = `${assetBasePath}${ext}`;
-            console.log('Checking path:', testPath);
+            // console.log('Checking path:', testPath);
 
             try {
                 await fs.access(testPath);
                 existingPath = testPath;
-                console.log('Found asset at:', existingPath);
+                // console.log('Found asset at:', existingPath);
                 break;
             } catch (err) {
-                console.log('Not found:', testPath);
+                // console.log('Not found:', testPath);
                 continue;
             }
         }
 
         if (!existingPath) {
-            console.error('No matching asset found with any extension');
+            // console.error('No matching asset found with any extension');
             return createError({
                 statusCode: 404,
                 statusMessage: "Asset not found",
@@ -71,7 +63,7 @@ export default defineEventHandler(async (event) => {
 
         // Read the found file
         const fileData = await fs.readFile(existingPath);
-        console.log('Successfully read file, size:', fileData.length);
+        // console.log('Successfully read file, size:', fileData.length);
 
         // Determine content type
         let contentType = 'application/octet-stream';

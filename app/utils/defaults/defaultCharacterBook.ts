@@ -6,7 +6,7 @@ export default function (ov?: Partial<CharacterBook>): CharacterBook {
         entries: ov?.entries || [],
         extensions: ov?.extensions || {},
         description: ov?.description || '',
-        scan_depth: ov?.scan_depth || 100,
+        scan_depth: ov?.scan_depth || 5,
         token_budget: ov?.token_budget,
         recursive_scanning: ov?.recursive_scanning || false,
     } satisfies CharacterBook

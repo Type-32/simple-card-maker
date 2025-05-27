@@ -8,6 +8,8 @@ import {useQuickToasts} from "~/composables/utility/useQuickToasts";
 import type {TavernCardV2} from "~/types/tavern.types";
 import defaultTavernCard from "~/utils/defaults/defaultTavernCard";
 import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
+import {useLorebook} from "~/composables/editing/useLorebook";
+import {useUUID} from "~/composables/utility/useUUID";
 
 definePageMeta({
     layout: 'workspace-tabs-layout'
@@ -104,73 +106,79 @@ async function setCardImage() {
     }
 }
 
-// const loadImage = async () => {
-//     const response = await $fetch(coverImageAssetUrl() || '');
-//     const blob = await response as Blob;
-//     imageUrl.value = URL.createObjectURL(blob);
-// };
-//
-// // Call this after upload
-// const refreshImage = async () => {
-//     await loadImage();
-// };
+const availableLorebooks = computed(() => (unref($wk.loadedWorkspace)?.books?.map(e => ({
+        label: `${e.book.name} (${e.id.substring(0, 5)})` || `Untitled Lorebook (${e.id.substring(0, 5)})`,
+        id: e.id,
+    })) || [])
+)
+
+function jumpToEditLorebook() {
+    const link = unref(card).data.linkedLorebook
+    if (link == undefined)
+        $qt.warning("Please link a lorebook first.")
+
+    $wk.saveWorkspace().then()
+    $wk.directToLorebook(link || '')
+}
+
 </script>
 
 <template>
     <div>
-        <div class="w-full h-full overflow-visible py-2 px-4 my-9">
+        <div class="w-full h-full overflow-visible py-2 px-9 my-9">
+            <div class="w-full flex items-center justify-between gap-4 mb-4">
+                <div class="grid grid-cols-1 gap-1">
+                    <UButton
+                        label="Back to Workspace"
+                        class="w-full text-muted"
+                        icon="lucide:arrow-left"
+                        @click="backToHome()"
+                        :loading="saving"
+                        variant="link"
+                        size="xs"
+                    />
+                    <div class="text-2xl font-bold">Editing Character "{{state.data.name}}"</div>
+                    <div class="text-muted text-sm">Modify your character.</div>
+                </div>
+                <div>
+                    <UButton :loading="hasChanges" icon="lucide:save" :label="hasChanges ? 'Saving...' : 'Auto-Save'"/>
+                </div>
+            </div>
             <div class="grid grid-cols-7 gap-4 overflow-visible">
-                <div class="col-span-2 h-fit top-0">
-                    <UCard>
-                        <template #header>
-                            <div class="w-full flex items-center justify-between gap-4">
-                                <UButton
-                                    label="Back to Workspace"
-                                    class="w-full text-muted"
-                                    icon="lucide:arrow-left"
-                                    @click="backToHome()"
-                                    :loading="saving"
-                                    variant="link"
-                                    size="sm"
-                                />
-                                <div>
-                                    <UTooltip text="Whether your current workspace is saved.">
-                                        <UIcon name="lucide:loader-circle" class="text-muted animate-spin" size="sm" v-if="hasChanges"/>
-                                        <UIcon name="lucide:check" class="text-muted" size="sm" v-else/>
-                                    </UTooltip>
-                                </div>
-                            </div>
-                        </template>
-                        <template #default>
-                            <div class="grid grid-cols-1 gap-4">
-                                <UDropdownMenu :items="[
+                <div class="col-span-2 h-fit">
+                    <div class="sticky top-6">
+                        <UCard class="">
+                            <template #default>
+                                <div class="grid grid-cols-1 gap-4">
+                                    <UDropdownMenu :items="[
                                     [{label: 'Upload New Image', icon: 'lucide:upload', onSelect() { setCardImage() }}]
                                 ]">
-                                    <img :src="unref(imageUrl)" alt="Card" class="rounded-lg object-contain hover:cursor-pointer hover:opacity-90 transition duration-300"/>
-                                </UDropdownMenu>
-                                <UForm :state :validate class="grid grid-cols-1 gap-4">
-                                    <UFormField name="name" required label="Name" size="lg">
-                                        <UInput v-model="state.data.name" class="w-full"/>
-                                    </UFormField>
-                                    <UFormField name="tags" required label="Tags" size="lg">
-                                        <UInputMenu multiple create-item :items="state.data.tags" @create="onCreateTag" v-model="state.data.tags" class="w-full"/>
-                                    </UFormField>
-                                    <UFormField name="creator" required label="Creator" size="lg">
-                                        <UInput v-model="state.data.creator" class="w-full"/>
-                                    </UFormField>
-                                    <UFormField name="version" required label="Version" size="lg">
-                                        <UInput v-model="state.data.character_version" class="w-full"/>
-                                    </UFormField>
-                                </UForm>
-                            </div>
-                        </template>
-                    </UCard>
+                                        <img :src="unref(imageUrl)" alt="Card" class="rounded-lg object-contain hover:cursor-pointer hover:opacity-90 transition duration-300"/>
+                                    </UDropdownMenu>
+                                    <UForm :state :validate class="grid grid-cols-1 gap-4">
+                                        <UFormField name="name" required label="Name" size="lg">
+                                            <UInput v-model="state.data.name" class="w-full"/>
+                                        </UFormField>
+                                        <UFormField name="tags" required label="Tags" size="lg">
+                                            <UInputMenu multiple create-item :items="state.data.tags" @create="onCreateTag" v-model="state.data.tags" class="w-full"/>
+                                        </UFormField>
+                                        <UFormField name="creator" required label="Creator" size="lg">
+                                            <UInput v-model="state.data.creator" class="w-full"/>
+                                        </UFormField>
+                                        <UFormField name="version" required label="Version" size="lg">
+                                            <UInput v-model="state.data.character_version" class="w-full"/>
+                                        </UFormField>
+                                    </UForm>
+                                </div>
+                            </template>
+                        </UCard>
+                    </div>
                 </div>
                 <div class="col-span-5 h-full w-full" v-if="card">
-                    <UCard>
-                        <UTabs :items="categoryTabs">
-                            <template #basic>
-                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                    <UTabs :items="categoryTabs">
+                        <template #basic>
+                            <UCard class="mt-2">
+                                <UForm :state :validate class="grid grid-cols-1 gap-4">
                                     <UFormField label="Description" description="A detailed description of your character.">
                                         <CharacterCompDescFieldsTabs
                                             :default-properties-format="card.data.propertiesFormat"
@@ -187,9 +195,11 @@ async function setCardImage() {
                                         <UTextarea v-model="state.data.scenario" class="w-full"/>
                                     </UFormField>
                                 </UForm>
-                            </template>
-                            <template #msgs>
-                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                            </UCard>
+                        </template>
+                        <template #msgs>
+                            <UCard class="mt-2">
+                                <UForm :state :validate class="grid grid-cols-1 gap-4">
                                     <UFormField label="First Message" description="This is how your character will introduce themselves.">
                                         <UTextarea v-model="state.data.first_mes" class="w-full"/>
                                     </UFormField>
@@ -200,9 +210,11 @@ async function setCardImage() {
                                         <CharacterCompStringArrayInputs v-model="card.data.exampleMessages" button-text="Add Example Message"/>
                                     </UFormField>
                                 </UForm>
-                            </template>
-                            <template #system>
-                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
+                            </UCard>
+                        </template>
+                        <template #system>
+                            <UCard class="mt-2">
+                                <UForm :state :validate class="grid grid-cols-1 gap-4">
                                     <UFormField label="System Prompt" description="Instructions for the AI on how to roleplay your character.">
                                         <UTextarea v-model="state.data.system_prompt" class="w-full"/>
                                     </UFormField>
@@ -210,16 +222,27 @@ async function setCardImage() {
                                         <UTextarea v-model="state.data.post_history_instructions" class="w-full"/>
                                     </UFormField>
                                 </UForm>
-                            </template>
-                            <template #adv>
-                                <UForm :state :validate class="grid grid-cols-1 gap-4 mt-3">
-                                    <UFormField label="Creator Notes" description="Additional notes about your character that aren't part of their description">
+                            </UCard>
+                        </template>
+                        <template #adv>
+                            <UCard class="mt-2">
+                                <UForm :state :validate class="grid grid-cols-1 gap-4">
+                                    <UFormField label="Creator Notes" description="Additional notes about your character that aren't part of their description.">
                                         <UTextarea v-model="state.data.creator_notes" class="w-full"/>
                                     </UFormField>
+                                    <UFormField label="Linked Lorebook" description="The lorebook linked to your character.">
+                                        <div class="flex flex-col w-full justify-center gap-2">
+                                            <USelectMenu v-model="card.data.linkedLorebook" :items="availableLorebooks" value-key="id" class="w-full"/>
+                                            <div class="space-x-2">
+                                                <UButton :disabled="card.data.linkedLorebook == undefined" variant="soft" size="sm" color="error" icon="lucide:x" label="Remove Link" @click="() => {card.data.linkedLorebook = undefined}"/>
+                                                <UButton :disabled="card.data.linkedLorebook == undefined" variant="soft" size="sm" icon="lucide:pen" label="Edit Lorebook" @click="jumpToEditLorebook()"/>
+                                            </div>
+                                        </div>
+                                    </UFormField>
                                 </UForm>
-                            </template>
-                        </UTabs>
-                    </UCard>
+                            </UCard>
+                        </template>
+                    </UTabs>
                 </div>
             </div>
         </div>

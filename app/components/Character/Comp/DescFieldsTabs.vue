@@ -135,7 +135,7 @@ function moveFieldDown(index: number) {
                     </UForm>
                 </div>
                 <div class="flex items-center gap-1">
-                    <UButton icon="lucide:plus" @click="addField" size="sm"/>
+                    <UButton icon="lucide:plus" @click="addField" size="sm" variant="soft" label="Add Field"/>
                     <UDropdownMenu
                         :items="[
                             [{label: 'Use Templates...', icon: 'lucide:copy-plus', children: getTemplates()}],
@@ -143,7 +143,7 @@ function moveFieldDown(index: number) {
                         ]"
                         size="sm"
                     >
-                        <UButton icon="lucide:ellipsis" size="sm" variant="outline"/>
+                        <UButton icon="lucide:ellipsis" size="sm" variant="soft"/>
                     </UDropdownMenu>
                 </div>
             </div>

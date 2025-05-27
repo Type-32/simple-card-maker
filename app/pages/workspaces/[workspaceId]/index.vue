@@ -33,7 +33,7 @@ function coverImageAssetUrl(card: WorkspaceCard) {
 
 <template>
     <div>
-        <div class="w-full h-full grid grid-cols-1 px-10 py-5">
+        <div class="w-full h-full grid grid-cols-1 px-10 py-5 pt-10">
             <div class="flex items-center w-full justify-between mb-6">
                 <div class="flex flex-col items-start justify-center select-none group">
                     <UButton variant="link" label="Home" icon="lucide:arrow-left" size="xs" class="text-muted" to="/"/>

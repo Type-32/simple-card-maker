@@ -1,4 +1,4 @@
-import type {Workspace} from "~/types/maker.types";
+import type {Workspace, WorkspaceBook, WorkspaceCard} from "~/types/maker.types";
 import {useQuickToasts} from "~/composables/utility/useQuickToasts";
 import type {PossiblyRef} from "~/types/utility.types";
 import defaultWorkspace from "~/utils/defaults/defaultWorkspace";
@@ -8,7 +8,8 @@ import defaultWorkspaceCard from "~/utils/defaults/defaultWorkspaceCard";
 import defaultWorkspaceBook from "~/utils/defaults/defaultWorkspaceBook";
 import defaultWorkspaceAssetEntry from "~/utils/defaults/defaultWorkspaceAssetEntry";
 import {join} from "@tauri-apps/api/path";
-import {type DialogFilter, open} from "@tauri-apps/plugin-dialog"
+import {type DialogFilter, open, save} from "@tauri-apps/plugin-dialog"
+import {useConversions} from "~/composables/editing/utility/useConversions";
 
 export function useWorkspace() {
     const $qt = useQuickToasts()
@@ -103,6 +104,14 @@ export function useWorkspace() {
             await directToLorebook(temp.id)
     }
 
+    function getCharacterCard(characterId: PossiblyRef<string>) {
+        return unref($loadedWorkspace)?.cards.find((value) => value.id == unref(characterId))
+    }
+
+    function getLorebook(lorebookId: PossiblyRef<string>) {
+        return unref($loadedWorkspace)?.books.find((value) => value.id == unref(lorebookId))
+    }
+
     async function uploadAsset(fileFormatFilters?: DialogFilter[]) {
         const wks = unref($loadedWorkspace)
         if (!wks) {
@@ -145,6 +154,78 @@ export function useWorkspace() {
         return navigateTo(`/workspaces/${unref($currentWorkspaceId)}/lorebook/${lorebookId}`)
     }
 
+    async function exportCharacter(card: WorkspaceCard, option?: 'v2_json' | 'v2_png' | 'workspace') {
+        const tavernCard = useConversions().convertWorkspaceCardToV2Card(card)
+        if (!option || option == 'v2_json') {
+            const saveDirFile = await save({
+                filters: [{
+                    name: 'JSON',
+                    extensions: ['json']
+                }]
+            })
+
+            if (!saveDirFile)
+                return;
+
+            await $mio.createV2JsonCardToDir(tavernCard, saveDirFile)
+        } else if (option == 'v2_png') {
+            if (!card.data.coverImageAsset)
+                return
+
+            const saveDirFile = await save({
+                filters: [{
+                    name: 'Image File',
+                    extensions: ['png']
+                }]
+            })
+
+            if (!saveDirFile)
+                return;
+
+            await $mio.createV2PngCardToDir(card.data.coverImageAsset, tavernCard, saveDirFile)
+        } else {
+            const saveDirFile = await save({
+                filters: [{
+                    name: 'JSON',
+                    extensions: ['json']
+                }]
+            })
+
+            if (!saveDirFile)
+                return;
+
+            await $mio.writeTextFileToDir(JSON.stringify(card), saveDirFile)
+        }
+    }
+
+    async function exportLorebook(book: WorkspaceBook, option?: 'v2_json' | 'workspace') {
+        if (!option || option == 'v2_json') {
+            const saveDirFile = await save({
+                filters: [{
+                    name: 'JSON',
+                    extensions: ['json']
+                }]
+            })
+
+            if (!saveDirFile)
+                return;
+
+            await $mio.writeTextFileToDir(JSON.stringify(book.book), saveDirFile)
+        } else {
+            const saveDirFile = await save({
+                filters: [{
+                    name: 'JSON',
+                    extensions: ['json']
+                }]
+            })
+
+            if (!saveDirFile)
+                return;
+
+            await $mio.writeTextFileToDir(JSON.stringify(book), saveDirFile)
+        }
+    }
+
     return {
         directToWorkspace,
         openWorkspace,
@@ -156,6 +237,10 @@ export function useWorkspace() {
         uploadAsset,
         directToCharacter,
         directToLorebook,
+        getCharacterCard,
+        getLorebook,
+        exportCharacter,
+        exportLorebook,
         loadedWorkspace: $loadedWorkspace,
         loadedWorkspaceId: $currentWorkspaceId,
     }

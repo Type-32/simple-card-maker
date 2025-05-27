@@ -1,6 +1,6 @@
 import type {TavernCardV2} from "~/types/tavern.types";
 
-export default function (ov?: Partial<TavernCardV2>) {
+export default function (ov?: Partial<TavernCardV2>): TavernCardV2 {
     return {
         spec: "chara_card_v2",
         spec_version: '2.0',
@@ -18,7 +18,8 @@ export default function (ov?: Partial<TavernCardV2>) {
             scenario: ov?.data?.scenario || '',
             system_prompt: ov?.data?.system_prompt || '',
             name: ov?.data?.name || '',
-            description: ov?.data?.description || ''
+            description: ov?.data?.description || '',
+            character_book: ov?.data?.character_book != undefined ? ov?.data.character_book : undefined
         }
     } satisfies TavernCardV2
 }
